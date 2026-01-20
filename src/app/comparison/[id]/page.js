@@ -20,43 +20,10 @@ export default async function ComparisonPage({ params }) {
         pdfs = files.filter(f => f.mimeType === 'application/pdf' || f.name.endsWith('.pdf'));
 
         if (htmlFile) {
-            let rawHtml = await getFileText(htmlFile.id);
-
-            // 1. First Pass: Check for escaped HTML entities which is common in wrappers
-            if (rawHtml.includes('&lt;!DOCTYPE html')) {
-                // Simple entity decoder
-                rawHtml = rawHtml
-                    .replace(/&lt;/g, '<')
-                    .replace(/&gt;/g, '>')
-                    .replace(/&quot;/g, '"')
-                    .replace(/&#39;/g, "'")
-                    .replace(/&amp;/g, '&');
-            }
-
-            // 2. Smart Extraction: Find <!DOCTYPE html> ... </html>
-            // Case insensitive search for the start
-            const startRegex = /<!DOCTYPE html>/i;
-            const startMatch = rawHtml.match(startRegex);
-            const endMarker = '</html>';
-
-            if (startMatch) {
-                const startIndex = startMatch.index;
-                const endIndex = rawHtml.lastIndexOf(endMarker);
-
-                if (endIndex !== -1 && endIndex > startIndex) {
-                    // Extract strictly
-                    htmlContent = rawHtml.substring(startIndex, endIndex + endMarker.length);
-                } else {
-                    // Fallback: Take everything from start marker
-                    htmlContent = rawHtml.substring(startIndex);
-                }
-            } else {
-                console.error("HTML Extraction Failed: Could not find <!DOCTYPE html> marker");
-                console.error("Raw Content Preview (First 500 chars):", rawHtml.substring(0, 500));
-
-                // Fallback: Try to render as is, but it's likely broken wrapped content
-                htmlContent = rawHtml;
-            }
+            // User confirms file is clean UTF-8 HTML starting with <!DOCTYPE html>
+            // We fetch strictly as text and pass it through.
+            const rawHtml = await getFileText(htmlFile.id);
+            htmlContent = rawHtml;
         }
 
     } catch (e) {
