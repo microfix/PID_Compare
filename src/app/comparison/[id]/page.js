@@ -22,10 +22,23 @@ export default async function ComparisonPage({ params }) {
         if (htmlFile) {
             const rawHtml = await getFileText(htmlFile.id);
             // Clean up n8n metadata wrapper if present
-            const docTypeIndex = rawHtml.indexOf('<!DOCTYPE html>');
-            if (docTypeIndex !== -1) {
-                htmlContent = rawHtml.substring(docTypeIndex);
+            // We search for the standard HTML5 doctype and the closing html tag.
+            const startMarker = '<!DOCTYPE html>';
+            const endMarker = '</html>';
+
+            const startIndex = rawHtml.indexOf(startMarker);
+            const endIndex = rawHtml.lastIndexOf(endMarker);
+
+            if (startIndex !== -1) {
+                if (endIndex !== -1 && endIndex > startIndex) {
+                    // Extract strictly from DOCTYPE to </html>
+                    htmlContent = rawHtml.substring(startIndex, endIndex + endMarker.length);
+                } else {
+                    // Fallback: If no closing tag, take everything from start marker
+                    htmlContent = rawHtml.substring(startIndex);
+                }
             } else {
+                // If no doctype found, use as is (or handle as error if strict)
                 htmlContent = rawHtml;
             }
         }
