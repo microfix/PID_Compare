@@ -12,10 +12,10 @@ export default function Viewer({ htmlContent, pdfs }) {
                 <div style={{ padding: '0.5rem 1rem', background: '#222', borderBottom: '1px solid var(--border-color)', fontWeight: 'bold', fontSize: '0.875rem' }}>
                     AUDIT REPORT
                 </div>
-                <div style={{ flex: 1, position: 'relative' }}>
+                <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
                     <iframe
                         srcDoc={htmlContent}
-                        style={{ width: '100%', height: '100%', border: 'none', background: 'white' }}
+                        style={{ width: '100%', height: '100%', border: 'none', background: 'white', display: 'block' }}
                         title="Audit Report"
                         sandbox="allow-scripts" // Allow scripts if the report needs them, usually safer to restrict
                     />

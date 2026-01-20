@@ -20,25 +20,41 @@ export default async function ComparisonPage({ params }) {
         pdfs = files.filter(f => f.mimeType === 'application/pdf' || f.name.endsWith('.pdf'));
 
         if (htmlFile) {
-            const rawHtml = await getFileText(htmlFile.id);
-            // Clean up n8n metadata wrapper if present
-            // We search for the standard HTML5 doctype and the closing html tag.
-            const startMarker = '<!DOCTYPE html>';
+            let rawHtml = await getFileText(htmlFile.id);
+
+            // 1. First Pass: Check for escaped HTML entities which is common in wrappers
+            if (rawHtml.includes('&lt;!DOCTYPE html')) {
+                // Simple entity decoder
+                rawHtml = rawHtml
+                    .replace(/&lt;/g, '<')
+                    .replace(/&gt;/g, '>')
+                    .replace(/&quot;/g, '"')
+                    .replace(/&#39;/g, "'")
+                    .replace(/&amp;/g, '&');
+            }
+
+            // 2. Smart Extraction: Find <!DOCTYPE html> ... </html>
+            // Case insensitive search for the start
+            const startRegex = /<!DOCTYPE html>/i;
+            const startMatch = rawHtml.match(startRegex);
             const endMarker = '</html>';
 
-            const startIndex = rawHtml.indexOf(startMarker);
-            const endIndex = rawHtml.lastIndexOf(endMarker);
+            if (startMatch) {
+                const startIndex = startMatch.index;
+                const endIndex = rawHtml.lastIndexOf(endMarker);
 
-            if (startIndex !== -1) {
                 if (endIndex !== -1 && endIndex > startIndex) {
-                    // Extract strictly from DOCTYPE to </html>
+                    // Extract strictly
                     htmlContent = rawHtml.substring(startIndex, endIndex + endMarker.length);
                 } else {
-                    // Fallback: If no closing tag, take everything from start marker
+                    // Fallback: Take everything from start marker
                     htmlContent = rawHtml.substring(startIndex);
                 }
             } else {
-                // If no doctype found, use as is (or handle as error if strict)
+                console.error("HTML Extraction Failed: Could not find <!DOCTYPE html> marker");
+                console.error("Raw Content Preview (First 500 chars):", rawHtml.substring(0, 500));
+
+                // Fallback: Try to render as is, but it's likely broken wrapped content
                 htmlContent = rawHtml;
             }
         }
