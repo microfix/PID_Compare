@@ -5,8 +5,9 @@ const SCOPES = ['https://www.googleapis.com/auth/drive'];
 
 function getAuth() {
   const serviceAccountJson = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+
   if (!serviceAccountJson) {
-    console.error('GOOGLE_SERVICE_ACCOUNT_JSON is missing');
+    console.error("CRITICAL ERROR: GOOGLE_SERVICE_ACCOUNT_JSON is empty or undefined!");
     throw new Error('GOOGLE_SERVICE_ACCOUNT_JSON is not defined');
   }
 
@@ -14,22 +15,25 @@ function getAuth() {
   try {
     credentials = JSON.parse(serviceAccountJson);
   } catch (e) {
-    console.error('Failed to parse GOOGLE_SERVICE_ACCOUNT_JSON:', e.message);
-    throw new Error('Failed to parse GOOGLE_SERVICE_ACCOUNT_JSON. Ensure it is valid JSON.');
+    console.error("CRITICAL ERROR: Failed to parse GOOGLE_SERVICE_ACCOUNT_JSON. Check JSON format in Coolify.", e.message);
+    throw new Error('Failed to parse GOOGLE_SERVICE_ACCOUNT_JSON');
   }
 
-  return new google.auth.JWT(
-    credentials.client_email,
-    null,
-    credentials.private_key,
-    SCOPES
-  );
+  // Use GoogleAuth which is more robust for service accounts
+  const auth = new google.auth.GoogleAuth({
+    credentials,
+    scopes: SCOPES,
+  });
+
+  return auth;
 }
 
 export async function getDriveClient() {
   try {
     const auth = getAuth();
-    return google.drive({ version: 'v3', auth });
+    // Explicitly await the client client if necessary, but passing auth to drive() works for GoogleAuth
+    const drive = google.drive({ version: 'v3', auth });
+    return drive;
   } catch (e) {
     console.error('Error initializing Drive client:', e);
     throw e;
