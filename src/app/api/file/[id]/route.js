@@ -1,27 +1,32 @@
-import { getFileStream } from '@/lib/drive';
+import { getFileStream, getDriveClient } from '@/lib/drive';
 import { NextResponse } from 'next/server';
 
 export async function GET(request, { params }) {
-    const { id } = params;
+    // Await params for Next.js 15+ compatibility
+    const { id } = await params;
 
     try {
+        console.log(`Streaming file ID: ${id}`);
+
+        // 1. Get File Metadata to confirm it exists and gets MIME type (Optional but good)
+        // For speed, we just assume PDF if usage is strict, but let's try to be safe.
+        // const meta = await drive.files.get({ fileId: id, fields: 'mimeType, size' });
+
+        // 2. Get the stream
         const stream = await getFileStream(id);
 
-        // We assume it's PDF or HTML. In a real app we'd look up mimeType.
-        // However, the browser handles streams. 
-        // We should probably set headers content-type if possible, but the drive stream might not carry it easily?
-        // Actually google drive files.get with alt=media returns the body.
-        // We can infer type or just let browser detect.
-        // Better: Helper in drive.js to get metadata first? 
-        // For performance, we'll try to just stream it. 
-        // But for PDF in iframe, correct Content-Type is important.
+        // 3. Return as stream with PDF headers
+        // Using standard Response (Node/Web) which Next.js supports for streaming
+        return new NextResponse(stream, {
+            headers: {
+                'Content-Type': 'application/pdf',
+                'Content-Disposition': 'inline', // Opens in browser/iframe instead of download
+                'Cache-Control': 'public, max-age=3600'
+            }
+        });
 
-        // Quick fix: user params might hint type? 
-        // Or we rely on `NextResponse` streaming.
-
-        return new NextResponse(stream);
     } catch (e) {
-        console.error(e);
-        return new NextResponse("File not found", { status: 404 });
+        console.error("PDF Stream Error:", e.message);
+        return new NextResponse("File not found or inaccessible", { status: 404 });
     }
 }
