@@ -6,17 +6,26 @@ import Viewer from './viewer'; // Client component for split view
 export const dynamic = 'force-dynamic';
 
 export default async function ComparisonPage({ params }) {
-    const { id } = params;
+    // In Next.js 15+, params is a Promise that must be awaited
+    const { id } = await params;
+
+    console.log("Current Folder ID from URL:", id);
+
     let files = [];
     let error = null;
     let htmlContent = '';
     let pdfs = [];
 
     try {
+        if (!id) {
+            throw new Error("Folder ID is undefined. URL parameter missing.");
+        }
+
         files = await getFolderDetails(id);
 
         // identify files
-        const htmlFile = files.find(f => f.mimeType === 'text/html' || f.name.endsWith('.html'));
+        // Targeted fetch: Look specifically for audit_rapport.html
+        const htmlFile = files.find(f => f.name === 'audit_rapport.html' || f.name.endsWith('.html'));
         pdfs = files.filter(f => f.mimeType === 'application/pdf' || f.name.endsWith('.pdf'));
 
         if (htmlFile) {
