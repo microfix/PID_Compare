@@ -59,7 +59,7 @@ export default async function Dashboard() {
                       {new Date(folder.createdTime).toLocaleDateString()}
                     </span>
                   </div>
-                  <h3>{folder.name}</h3>
+                  <h3>{folder.name.replace(/\.[^/.]+$/, "")}</h3>
                   <div style={{ marginTop: '1rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
                     View Comparison Report &rarr;
                   </div>

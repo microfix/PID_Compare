@@ -44,7 +44,7 @@ export default async function PlantPage({ params }) {
                             <div className="card">
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
                                     <Folder size={24} style={{ color: 'var(--accent-blue)' }} />
-                                    <h3>{folder.name}</h3>
+                                    <h3>{folder.name.replace(/\.[^/.]+$/, "")}</h3>
                                 </div>
                                 <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
                                     View Comparisons &rarr;

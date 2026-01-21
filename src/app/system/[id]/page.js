@@ -57,7 +57,7 @@ export default async function SystemPage({ params }) {
                                 <div className="card">
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
                                         <FileDiff size={24} style={{ color: 'var(--accent-green)' }} />
-                                        <h3>{comp.revA} ↔ {comp.revB}</h3>
+                                        <h3>{comp.revA.replace(/\.[^/.]+$/, "")} ↔ {comp.revB.replace(/\.[^/.]+$/, "")}</h3>
                                     </div>
                                     <div style={{ marginBottom: '0.5rem', fontWeight: 'bold' }}>
                                         {comp.name}
