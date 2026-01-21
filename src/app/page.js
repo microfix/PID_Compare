@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { listArchiveFolders } from '@/lib/drive';
 import { FileText, Upload, Clock } from 'lucide-react';
+import NewComparisonButton from './components/NewComparisonButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,10 +31,7 @@ export default async function Dashboard() {
     <main className="container">
       <div className="flex-between" style={{ marginBottom: '2rem' }}>
         <h1 className="title" style={{ marginBottom: 0 }}>Archive</h1>
-        <Link href="/upload" className="btn">
-          <Upload size={20} style={{ marginRight: '0.5rem' }} />
-          New Comparison
-        </Link>
+        <NewComparisonButton />
       </div>
 
       {error ? (
