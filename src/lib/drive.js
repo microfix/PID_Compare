@@ -81,9 +81,10 @@ export async function uploadFileToInput(fileObject) {
   try {
     // fileObject: { name, buffer, type }
     const drive = await getDriveClient();
-    const folderId = process.env.DRIVE_FOLDER_ID_INPUT;
-    if (!folderId) throw new Error('DRIVE_FOLDER_ID_INPUT is not defined');
+    // User requested explicit ID for this fix
+    const folderId = '1wNav_xCSYcQX5-BQgINN7vb9L8FcbkQu';
 
+    // Create a generic stream from validity
     const stream = new Readable();
     stream.push(fileObject.buffer);
     stream.push(null);
@@ -94,19 +95,24 @@ export async function uploadFileToInput(fileObject) {
     };
 
     const media = {
-      mimeType: fileObject.type,
+      mimeType: fileObject.type || 'application/pdf',
       body: stream,
     };
 
+    console.log(`Uploading file: ${fileObject.name} (${fileObject.buffer.length} bytes) to folder ${folderId}`);
+
     const res = await drive.files.create({
-      resource: fileMetadata,
+      requestBody: fileMetadata,
       media: media,
       fields: 'id, name',
     });
 
     return res.data;
   } catch (e) {
-    console.error('Google Drive Upload Error (uploadFileToInput):', e.message, e.response?.data);
+    console.error('Google Drive Upload Error (uploadFileToInput):', e.message);
+    if (e.response && e.response.data) {
+      console.error('Detailed Google API Error Response:', JSON.stringify(e.response.data, null, 2));
+    }
     throw e;
   }
 }
