@@ -1,17 +1,21 @@
-:root {
-  --background: #000000;
-  --foreground: #ffffff;
-  --accent-green: #4b5320;
-  --accent-brown: #4b3621;
-  --status-safe: #4b5320;
-  --status-critical: #8b0000;
-  /* Muted deep red */
-  --border-color: #333333;
-  --card-bg: #111111;
-  --text-muted: #aaaaaa;
+@import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-  --font-mono: var(--font-geist-mono);
-  --font-sans: var(--font-geist-sans);
+:root {
+  --background: #050505;
+  --foreground: #e2e2e2;
+
+  /* Army Theme Colors */
+  --army-green: #4B5320;
+  --army-green-light: #5d662a;
+  --army-brown: #4B3D21;
+  --army-brown-light: #5e4d2b;
+
+  --status-critical: #8b0000;
+  --border-subtle: #1f1f1f;
+
+  --font-heading: 'Special Elite', cursive;
+  --font-body: 'Inter', sans-serif;
 }
 
 * {
@@ -26,7 +30,7 @@ body {
   overflow-x: hidden;
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), system-ui, sans-serif;
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -36,104 +40,49 @@ h3,
 h4,
 h5,
 h6 {
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-family: var(--font-heading);
   text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #fff;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+.font-heading {
+  font-family: var(--font-heading);
 }
 
-/* Utilities */
 .container {
-  max-width: 1400px;
+  max-width: 1600px;
   margin: 0 auto;
   padding: 2rem;
 }
 
-.title {
-  font-size: 2rem;
-  margin-bottom: 2rem;
-  border-bottom: 2px solid var(--accent-green);
-  padding-bottom: 0.5rem;
-  display: inline-block;
+/* Modern Army Utilities */
+.army-border {
+  border: 1px solid var(--army-green);
 }
 
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem 1.5rem;
-  background-color: var(--accent-green);
-  color: white;
-  border: 1px solid transparent;
-  font-weight: bold;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: var(--font-mono);
-  font-size: 0.875rem;
+.army-text {
+  color: var(--army-green);
 }
 
-.btn:hover {
-  background-color: #3a4019;
-  /* slightly darker */
-  border-color: #ffffff;
+.army-bg {
+  background-color: var(--army-green);
 }
 
-.btn-secondary {
-  background-color: var(--accent-brown);
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
 }
 
-.btn-secondary:hover {
-  background-color: #362618;
+::-webkit-scrollbar-track {
+  background: var(--background);
 }
 
-.card {
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  padding: 1.5rem;
-  transition: border-color 0.2s;
+::-webkit-scrollbar-thumb {
+  background: var(--army-brown);
+  border-radius: 4px;
 }
 
-.card:hover {
-  border-color: var(--accent-green);
-}
-
-.status-badge {
-  display: inline-block;
-  padding: 0.25rem 0.5rem;
-  font-weight: bold;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.status-safe {
-  background-color: var(--status-safe);
-  color: white;
-}
-
-.status-critical {
-  background-color: var(--status-critical);
-  color: white;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-}
-
-.flex-between {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.text-muted {
-  color: var(--text-muted);
+::-webkit-scrollbar-thumb:hover {
+  background: var(--army-green);
 }
