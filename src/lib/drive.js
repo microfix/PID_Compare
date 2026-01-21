@@ -140,3 +140,76 @@ export async function getFileText(fileId) {
     throw e;
   }
 }
+
+export async function getComparisons(folderId) {
+  try {
+    const files = await getFolderDetails(folderId);
+
+    const folders = files.filter(f => f.mimeType === 'application/vnd.google-apps.folder');
+
+    // Parse comparisons
+    // Pattern: "Compare [RevA] - [RevB].html"
+    const compareRegex = /^Compare\s+(.+?)\s+-\s+(.+?)\.html$/i;
+
+    const comparisons = [];
+    const htmlFiles = files.filter(f => f.mimeType !== 'application/vnd.google-apps.folder' && f.name.toLowerCase().endsWith('.html'));
+
+    // Create a lookup for PDFs to avoid O(N^2)
+    // Map filename -> file object
+    const fileMap = new Map();
+    files.forEach(f => {
+      // Store exact name
+      fileMap.set(f.name, f);
+      // Also store lowercase for case-insensitivity if needed? 
+      // User prompt implies exact revision matching: "001c" -> "001c.pdf"
+    });
+
+    for (const file of htmlFiles) {
+      const match = file.name.match(compareRegex);
+      if (match) {
+        const revA = match[1].trim();
+        const revB = match[2].trim();
+
+        // Find corresponding PDFs
+        // Assumption: PDF name is exactly "[Rev].pdf"
+        const pdfA = fileMap.get(`${revA}.pdf`);
+        const pdfB = fileMap.get(`${revB}.pdf`);
+
+        if (pdfA && pdfB) {
+          comparisons.push({
+            type: 'comparison',
+            id: file.id, // HTML File ID
+            name: `Sammenligning: Rev ${revA} mod Rev ${revB}`,
+            htmlFile: file,
+            pdfA: pdfA,
+            pdfB: pdfB,
+            revA,
+            revB
+          });
+        } else {
+          // Partial match or missing PDF? 
+          // We can still list it but maybe indicate missing data.
+          // For now, strict requirement: "Fetch these PDFs ... using their specific IDs"
+          // If missing, maybe better to exclude or mark invalid.
+          // I'll include it but with nulls so UI can handle error.
+          comparisons.push({
+            type: 'comparison',
+            id: file.id,
+            name: `Sammenligning: Rev ${revA} mod Rev ${revB} (Incomplete)`,
+            htmlFile: file,
+            pdfA: pdfA || null,
+            pdfB: pdfB || null,
+            revA,
+            revB
+          });
+        }
+      }
+    }
+
+    return { folders, comparisons };
+
+  } catch (e) {
+    console.error("Error parsing comparisons for folder", folderId, e);
+    throw e;
+  }
+}

@@ -50,7 +50,7 @@ export default async function Dashboard() {
           {folders.map((folder) => {
             const status = getStatus(folder);
             return (
-              <Link href={`/comparison/${folder.id}`} key={folder.id} className="card-link">
+              <Link href={`/plant/${folder.id}`} key={folder.id} className="card-link">
                 <div className="card">
                   <div className="flex-between" style={{ marginBottom: '1rem' }}>
                     <div className={`status-badge ${status === 'critical' ? 'status-critical' : 'status-safe'}`}>
