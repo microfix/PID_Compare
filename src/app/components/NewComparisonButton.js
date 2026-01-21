@@ -9,6 +9,18 @@ export default function NewComparisonButton({ currentFolderId, currentFolderName
     const [message, setMessage] = useState('');
     const [success, setSuccess] = useState(false);
 
+    const resetState = () => {
+        setLoading(false);
+        setMessage('');
+        setSuccess(false);
+    };
+
+    const handleClose = () => {
+        setShowModal(false);
+        // Small delay to allow fade out if we had one, but instant is fine.
+        resetState();
+    };
+
     const handleTrigger = async () => {
         setLoading(true);
         setMessage('n8n analyserer nu dine filer... Dette tager ca. 1 minut. Du kan lukke dette vindue.');
@@ -35,6 +47,7 @@ export default function NewComparisonButton({ currentFolderId, currentFolderName
                 // I will update the UI to show this success state clearly.
             } else {
                 setMessage('Der opstod en fejl ved kontakt til n8n.');
+                // Don't set success, so user can try again or cancel
             }
         } catch (e) {
             console.error(e);
@@ -55,16 +68,22 @@ export default function NewComparisonButton({ currentFolderId, currentFolderName
 
     return (
         <>
-            <button className="btn" onClick={() => setShowModal(true)}>
+            <button className="btn" onClick={() => { resetState(); setShowModal(true); }}>
                 New Comparison
             </button>
 
             {/* Modal */}
             {showModal && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                    backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
-                }}>
+                <div
+                    style={{
+                        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                        backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
+                    }}
+                    onClick={(e) => {
+                        // Close if clicking outside card
+                        if (e.target === e.currentTarget) handleClose();
+                    }}
+                >
                     <div className="card" style={{ width: '100%', maxWidth: '500px', textAlign: 'center' }}>
                         {!success ? (
                             <>
@@ -83,7 +102,7 @@ export default function NewComparisonButton({ currentFolderId, currentFolderName
                                         <button className="btn btn-secondary" onClick={openDriveFolder}>
                                             NEJ / ÅBN MAPPE
                                         </button>
-                                        <button className="btn" style={{ background: 'transparent', border: '1px solid var(--border-color)' }} onClick={() => setShowModal(false)}>
+                                        <button className="btn" style={{ background: 'transparent', border: '1px solid var(--border-color)' }} onClick={handleClose}>
                                             ANNULLER
                                         </button>
                                     </div>
@@ -93,7 +112,7 @@ export default function NewComparisonButton({ currentFolderId, currentFolderName
                             <div style={{ padding: '1rem' }}>
                                 <h3 style={{ color: 'var(--accent-green)', marginBottom: '1rem' }}>Sammenligning sat i gang!</h3>
                                 <p>Rapporten dukker op i listen om lidt.</p>
-                                <button className="btn" onClick={() => setShowModal(false)} style={{ marginTop: '1.5rem' }}>
+                                <button className="btn" onClick={handleClose} style={{ marginTop: '1.5rem' }}>
                                     Luk
                                 </button>
                             </div>
