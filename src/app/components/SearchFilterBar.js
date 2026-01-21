@@ -66,64 +66,72 @@ export default function SearchFilterBar({ searchTerm, setSearchTerm, sortOption,
     const [showSortMenu, setShowSortMenu] = useState(false);
 
     const sortLabels = {
-        'newest': 'Newest / Numeric Desc',
-        'oldest': 'Oldest / Numeric Asc',
+        'newest': 'Newest',
+        'oldest': 'Oldest',
         'a-z': 'Name (A-Z)',
         'z-a': 'Name (Z-A)'
     };
 
     return (
-        <div className="sticky top-0 z-10 bg-black pt-4 pb-4 mb-4 border-b border-gray-800" style={{ backgroundColor: 'var(--background)', borderColor: 'var(--border-color)' }}>
-            <div className="flex gap-2">
-                <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                    <input
-                        type="text"
-                        className="w-full bg-gray-900 border border-gray-700 rounded-md py-2 pl-10 pr-10 text-white focus:outline-none focus:border-green-700"
-                        style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)', color: 'var(--foreground)' }}
-                        placeholder={placeholder}
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                    {searchTerm && (
-                        <button
-                            onClick={() => setSearchTerm('')}
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
-                        >
-                            <X size={16} />
-                        </button>
-                    )}
-                </div>
-
-                <div className="relative">
+        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-8 pt-2 pb-2">
+            {/* Search Bar - Minimalist Underline */}
+            <div className="relative flex-1 w-full sm:max-w-md group">
+                <Search
+                    className="absolute left-0 top-1/2 transform -translate-y-1/2 text-[#4b5320] transition-colors group-focus-within:text-[#4b5320]"
+                    size={20}
+                />
+                <input
+                    type="text"
+                    className="w-full bg-transparent border-b-2 border-[#333] py-2 pl-8 pr-8 text-white font-medium placeholder-zinc-600 focus:outline-none focus:border-[#4b5320] transition-all duration-300"
+                    placeholder={placeholder}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                {searchTerm && (
                     <button
-                        onClick={() => setShowSortMenu(!showSortMenu)}
-                        className="h-full px-4 bg-gray-900 border border-gray-700 rounded-md text-gray-300 hover:text-white flex items-center gap-2"
-                        style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)', color: 'var(--foreground)' }}
+                        onClick={() => setSearchTerm('')}
+                        className="absolute right-0 top-1/2 transform -translate-y-1/2 text-zinc-500 hover:text-white transition-colors"
                     >
-                        <ArrowUpDown size={18} />
-                        <span className="hidden sm:inline">{sortLabels[sortOption] || 'Sort'}</span>
+                        <X size={16} />
                     </button>
+                )}
+            </div>
 
-                    {showSortMenu && (
-                        <>
-                            <div className="fixed inset-0 z-10" onClick={() => setShowSortMenu(false)}></div>
-                            <div className="absolute right-0 mt-2 w-56 bg-gray-900 border border-gray-700 rounded-md shadow-xl z-20 overflow-hidden"
-                                style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)' }}>
-                                {Object.keys(sortLabels).map(key => (
-                                    <button
-                                        key={key}
-                                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-800 ${sortOption === key ? 'text-green-500 font-bold' : 'text-gray-300'}`}
-                                        style={{ color: sortOption === key ? 'var(--accent-green)' : 'var(--text-muted)' }}
-                                        onClick={() => { setSortOption(key); setShowSortMenu(false); }}
-                                    >
-                                        {sortLabels[key]}
-                                    </button>
-                                ))}
-                            </div>
-                        </>
-                    )}
-                </div>
+            {/* Sort Menu - Sleek Text Trigger */}
+            <div className="relative ml-auto sm:ml-0">
+                <button
+                    onClick={() => setShowSortMenu(!showSortMenu)}
+                    className="flex items-center gap-3 text-right hover:opacity-80 transition-opacity"
+                >
+                    <div className="flex flex-col">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#4b3621]">Sort By</span>
+                        <span className="text-sm font-bold text-white uppercase tracking-wide">{sortLabels[sortOption]}</span>
+                    </div>
+                    <div className="h-8 w-8 flex items-center justify-center bg-[#1a1a1a] rounded-sm border border-[#333]">
+                        <ArrowUpDown className="text-[#4b5320]" size={16} />
+                    </div>
+                </button>
+
+                {showSortMenu && (
+                    <>
+                        <div className="fixed inset-0 z-10" onClick={() => setShowSortMenu(false)}></div>
+                        <div className="absolute right-0 mt-2 w-48 bg-[#111] border border-[#333] shadow-2xl z-20">
+                            {Object.keys(sortLabels).map(key => (
+                                <button
+                                    key={key}
+                                    className={`w-full text-right px-4 py-3 text-sm font-bold uppercase tracking-wide transition-all border-l-2
+                                        ${sortOption === key
+                                            ? 'bg-[#1a1a1a] text-white border-[#4b5320]'
+                                            : 'text-zinc-500 border-transparent hover:text-white hover:bg-[#1a1a1a]'
+                                        }`}
+                                    onClick={() => { setSortOption(key); setShowSortMenu(false); }}
+                                >
+                                    {sortLabels[key]}
+                                </button>
+                            ))}
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );
