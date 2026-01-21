@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Search, ChevronDown, X } from 'lucide-react';
+import { Search, ChevronDown, Check } from 'lucide-react'; // Added Check for active state in dropdown
 
 export function useSearchAndSort(initialItems, defaultSort = 'newest') {
     const [searchTerm, setSearchTerm] = useState('');
@@ -49,7 +49,6 @@ export default function SearchFilterBar({ searchTerm, setSearchTerm, sortOption,
     const [showSortMenu, setShowSortMenu] = useState(false);
     const dropdownRef = useRef(null);
 
-    // Close dropdown when clicking outside
     useEffect(() => {
         function handleClickOutside(event) {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -70,64 +69,62 @@ export default function SearchFilterBar({ searchTerm, setSearchTerm, sortOption,
     };
 
     return (
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 pt-4 mb-2">
-            {/* Search Bar - Military Style */}
-            <div className="relative flex-1 max-w-xl group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Search className="text-zinc-400" size={20} strokeWidth={2} />
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 w-full">
+            {/* Search Bar Container */}
+            <div className="flex-1 w-full max-w-2xl">
+                <div className="flex items-center w-full border border-[#4B5320] bg-black/40 h-12 px-4 rounded-sm transition-colors focus-within:border-[#6B7530]">
+                    <Search className="text-[#4B3D21] shrink-0 mr-3" size={20} strokeWidth={2.5} />
+                    <input
+                        type="text"
+                        className="flex-1 bg-transparent border-none text-white placeholder-neutral-600 focus:ring-0 focus:outline-none h-full w-full font-medium"
+                        placeholder={placeholder}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
                 </div>
-                <input
-                    type="text"
-                    className="block w-full bg-transparent border border-[#4B5320] rounded-md py-3 pl-12 pr-10 text-white placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-[#4B5320] focus:border-[#4B5320] transition-all duration-200 text-lg"
-                    placeholder={placeholder}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                {searchTerm && (
-                    <button
-                        type="button"
-                        onClick={() => setSearchTerm('')}
-                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-[#4B3D21] hover:text-white transition-colors cursor-pointer"
-                    >
-                        <X size={20} />
-                    </button>
-                )}
             </div>
 
-            {/* Sort Controls - Custom Dropdown */}
-            <div className="flex items-center gap-4 relative" ref={dropdownRef}>
-                <span className="text-zinc-400 text-lg">Sort By:</span>
+            {/* Sort Controls */}
+            <div className="flex items-center justify-end gap-3 min-w-fit" ref={dropdownRef}>
+                <span className="text-white font-bold tracking-wide text-sm whitespace-nowrap hidden sm:inline-block">
+                    Sort By:
+                </span>
 
                 <div className="relative">
+                    {/* Custom Trigger Button - Army Green Background */}
                     <button
                         type="button"
                         onClick={() => setShowSortMenu(!showSortMenu)}
-                        className="flex items-center gap-3 bg-[#1a1a1a] hover:bg-[#222] border border-[#333] text-white px-4 py-2 rounded-md transition-colors min-w-[160px] justify-between group"
+                        className="flex items-center justify-between gap-3 bg-[#4B5320] hover:bg-[#3d441b] text-white h-10 px-4 rounded-sm transition-all shadow-lg min-w-[140px]"
                     >
-                        <span className="font-medium bg-[#4B5320] px-2 py-0.5 rounded text-sm text-white shadow-sm flex-1 text-center">
+                        <span className="text-sm font-bold uppercase tracking-wider">
                             {sortLabels[sortOption]}
                         </span>
                         <ChevronDown
                             size={16}
-                            className={`text-zinc-400 transition-transform duration-200 ${showSortMenu ? 'rotate-180' : ''}`}
+                            strokeWidth={3}
+                            className={`transition-transform duration-200 ${showSortMenu ? 'rotate-180' : ''}`}
                         />
                     </button>
 
                     {/* Dropdown Menu */}
                     {showSortMenu && (
-                        <div className="absolute right-0 mt-2 w-full min-w-[160px] bg-[#0a0a0a] border border-[#333] shadow-[0_10px_40px_rgba(0,0,0,0.5)] z-30 flex flex-col rounded-md overflow-hidden">
+                        <div className="absolute right-0 top-full mt-2 w-full min-w-[160px] bg-[#0F0F0F] border border-[#333] shadow-2xl z-50 flex flex-col py-1">
                             {Object.entries(sortLabels).map(([key, label]) => (
                                 <button
                                     key={key}
                                     type="button"
-                                    className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors
+                                    className={`
+                                        w-full text-left px-4 py-3 text-sm font-bold uppercase tracking-wider transition-colors flex items-center justify-between
                                         ${sortOption === key
-                                            ? 'bg-[#4B5320]/20 text-[#4B5320]'
-                                            : 'text-zinc-400 hover:bg-[#4B5320] hover:text-white'
-                                        }`}
+                                            ? 'bg-[#4B5320] text-white'
+                                            : 'text-[#4B3D21] hover:bg-[#1a1a1a] hover:text-white'
+                                        }
+                                    `}
                                     onClick={() => { setSortOption(key); setShowSortMenu(false); }}
                                 >
                                     {label}
+                                    {sortOption === key && <Check size={14} strokeWidth={3} />}
                                 </button>
                             ))}
                         </div>
