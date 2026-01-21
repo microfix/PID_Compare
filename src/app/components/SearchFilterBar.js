@@ -77,12 +77,12 @@ export default function SearchFilterBar({ searchTerm, setSearchTerm, sortOption,
             {/* Search Bar - Minimalist Underline */}
             <div className="relative flex-1 w-full sm:max-w-md group">
                 <Search
-                    className="absolute left-0 top-1/2 transform -translate-y-1/2 text-[#4b5320] transition-colors group-focus-within:text-[#4b5320]"
+                    className="absolute left-0 top-1/2 transform -translate-y-1/2 text-[#4B3D21] transition-colors"
                     size={20}
                 />
                 <input
                     type="text"
-                    className="w-full bg-transparent border-b-2 border-[#333] py-2 pl-8 pr-8 text-white font-medium placeholder-zinc-600 focus:outline-none focus:border-[#4b5320] transition-all duration-300"
+                    className="w-full bg-transparent border-b-2 border-[#4B5320]/40 py-2 pl-8 pr-8 text-white font-bold placeholder-zinc-600 focus:outline-none focus:border-[#4B5320] transition-all duration-300"
                     placeholder={placeholder}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -90,7 +90,7 @@ export default function SearchFilterBar({ searchTerm, setSearchTerm, sortOption,
                 {searchTerm && (
                     <button
                         onClick={() => setSearchTerm('')}
-                        className="absolute right-0 top-1/2 transform -translate-y-1/2 text-zinc-500 hover:text-white transition-colors"
+                        className="absolute right-0 top-1/2 transform -translate-y-1/2 text-[#4B3D21] hover:text-white transition-colors"
                     >
                         <X size={16} />
                     </button>
@@ -104,11 +104,11 @@ export default function SearchFilterBar({ searchTerm, setSearchTerm, sortOption,
                     className="flex items-center gap-3 text-right hover:opacity-80 transition-opacity"
                 >
                     <div className="flex flex-col">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#4b3621]">Sort By</span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#4B3D21]">Sort By</span>
                         <span className="text-sm font-bold text-white uppercase tracking-wide">{sortLabels[sortOption]}</span>
                     </div>
-                    <div className="h-8 w-8 flex items-center justify-center bg-[#1a1a1a] rounded-sm border border-[#333]">
-                        <ArrowUpDown className="text-[#4b5320]" size={16} />
+                    <div className="h-8 w-8 flex items-center justify-center bg-transparent">
+                        <ArrowUpDown className="text-[#4B5320]" size={20} />
                     </div>
                 </button>
 
@@ -119,10 +119,10 @@ export default function SearchFilterBar({ searchTerm, setSearchTerm, sortOption,
                             {Object.keys(sortLabels).map(key => (
                                 <button
                                     key={key}
-                                    className={`w-full text-right px-4 py-3 text-sm font-bold uppercase tracking-wide transition-all border-l-2
+                                    className={`w-full text-right px-4 py-3 text-sm font-bold uppercase tracking-wide transition-all
                                         ${sortOption === key
-                                            ? 'bg-[#1a1a1a] text-white border-[#4b5320]'
-                                            : 'text-zinc-500 border-transparent hover:text-white hover:bg-[#1a1a1a]'
+                                            ? 'text-[#4B5320] underline decoration-2 underline-offset-4'
+                                            : 'text-zinc-500 hover:text-white hover:bg-[#1a1a1a]'
                                         }`}
                                     onClick={() => { setSortOption(key); setShowSortMenu(false); }}
                                 >
