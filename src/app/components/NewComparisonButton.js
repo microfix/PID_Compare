@@ -13,8 +13,8 @@ export default function NewComparisonButton({ currentFolderId, currentFolderName
         setLoading(true);
         setMessage('n8n analyserer nu dine filer... Dette tager ca. 1 minut. Du kan lukke dette vindue.');
 
-        // Trigger n8n Webhook
-        const webhookUrl = 'https://n8n.microfix.dk/webhook/774b9b23-c779-46cf-afa0-50c2744c2af1';
+        // Trigger n8n Webhook via Backend Proxy to avoid CSP issues
+        const webhookUrl = '/api/trigger-n8n';
 
         try {
             const res = await fetch(webhookUrl, {
