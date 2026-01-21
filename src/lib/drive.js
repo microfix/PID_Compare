@@ -169,9 +169,10 @@ export async function getComparisons(folderId) {
         const revB = match[2].trim();
 
         // Find corresponding PDFs
-        // Assumption: PDF name is exactly "[Rev].pdf" case-insensitive
-        const pdfA = fileMap.get(`${revA}.pdf`.toLowerCase());
-        const pdfB = fileMap.get(`${revB}.pdf`.toLowerCase());
+        // Assumption: PDF name is exactly "[Rev].pdf" OR just "[Rev]" case-insensitive
+        // Try with extension first, then without
+        const pdfA = fileMap.get(`${revA}.pdf`.toLowerCase()) || fileMap.get(revA.toLowerCase());
+        const pdfB = fileMap.get(`${revB}.pdf`.toLowerCase()) || fileMap.get(revB.toLowerCase());
 
         if (pdfA && pdfB) {
           comparisons.push({
