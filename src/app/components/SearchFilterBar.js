@@ -1,14 +1,14 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { Search, ChevronDown, Check } from 'lucide-react'; // Added Check for active state in dropdown
+import { useState } from 'react';
+import { Search, ArrowUpDown, X } from 'lucide-react';
 
 export function useSearchAndSort(initialItems, defaultSort = 'newest') {
     const [searchTerm, setSearchTerm] = useState('');
     const [sortOption, setSortOption] = useState(defaultSort);
 
     // Filter logic remains the same (smart numeric sort)
-    const filteredItems = initialItems.filter(item => {
+    const filteredItems = initialItems.filter(item => { // Quick filter for memo check, actual memo in real app
         if (!searchTerm) return true;
         const lowerTerm = searchTerm.toLowerCase();
         return (
@@ -45,91 +45,84 @@ export function useSearchAndSort(initialItems, defaultSort = 'newest') {
     return { searchTerm, setSearchTerm, sortOption, setSortOption, filteredItems };
 }
 
-export default function SearchFilterBar({ searchTerm, setSearchTerm, sortOption, setSortOption, placeholder = "Search plants..." }) {
+export default function SearchFilterBar({ searchTerm, setSearchTerm, sortOption, setSortOption, placeholder = "Search..." }) {
     const [showSortMenu, setShowSortMenu] = useState(false);
-    const dropdownRef = useRef(null);
-
-    useEffect(() => {
-        function handleClickOutside(event) {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setShowSortMenu(false);
-            }
-        }
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [dropdownRef]);
 
     const sortLabels = {
         'newest': 'Newest',
         'oldest': 'Oldest',
-        'a-z': 'A-Z',
-        'z-a': 'Z-A'
+        'a-z': 'Name (A-Z)',
+        'z-a': 'Name (Z-A)'
     };
 
     return (
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 w-full">
-            {/* Search Bar Container */}
-            <div className="flex-1 w-full max-w-2xl">
-                <div className="flex items-center w-full border border-[#4B5320] bg-black/40 h-12 px-4 rounded-sm transition-colors focus-within:border-[#6B7530]">
-                    <Search className="text-[#4B3D21] shrink-0 mr-3" size={20} strokeWidth={2.5} />
-                    <input
-                        type="text"
-                        className="flex-1 bg-transparent border-none text-white placeholder-neutral-600 focus:ring-0 focus:outline-none h-full w-full font-medium"
-                        placeholder={placeholder}
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
+        <div className="search-filter-container-v2 flex items-end justify-between gap-6 pb-6 pt-4 border-b border-[#333]/50 mb-8">
+            {/* Search Bar */}
+            <div className="relative flex-1 max-w-lg group">
+                <Search
+                    className="absolute left-0 bottom-3 text-[#4B3D21] transition-colors"
+                    size={22}
+                    strokeWidth={2.5}
+                />
+                <input
+                    type="text"
+                    className="appearance-none w-full bg-transparent border-b-2 border-[#4B5320]/40 py-2 pl-8 pr-10 text-white font-bold text-lg placeholder-zinc-600 focus:outline-none focus:border-[#4B5320] transition-all duration-200"
+                    placeholder={placeholder}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                {searchTerm && (
+                    <button
+                        type="button"
+                        onClick={() => setSearchTerm('')}
+                        className="absolute right-0 bottom-3 text-[#4B3D21] hover:text-white transition-colors cursor-pointer"
+                    >
+                        <X size={20} />
+                    </button>
+                )}
             </div>
 
             {/* Sort Controls */}
-            <div className="flex items-center justify-end gap-3 min-w-fit" ref={dropdownRef}>
-                <span className="text-white font-bold tracking-wide text-sm whitespace-nowrap hidden sm:inline-block">
-                    Sort By:
-                </span>
-
-                <div className="relative">
-                    {/* Custom Trigger Button - Army Green Background */}
-                    <button
-                        type="button"
-                        onClick={() => setShowSortMenu(!showSortMenu)}
-                        className="flex items-center justify-between gap-3 bg-[#4B5320] hover:bg-[#3d441b] text-white h-10 px-4 rounded-sm transition-all shadow-lg min-w-[140px]"
-                    >
-                        <span className="text-sm font-bold uppercase tracking-wider">
+            <div className="relative flex-shrink-0">
+                <button
+                    type="button"
+                    onClick={() => setShowSortMenu(!showSortMenu)}
+                    className="flex items-center gap-3 group focus:outline-none"
+                >
+                    <div className="flex flex-col text-right">
+                        <span className="text-[10px] uppercase tracking-widest font-black text-[#4B3D21] mb-0.5">Sort By</span>
+                        <span className="text-sm font-bold text-white uppercase tracking-wide group-hover:text-zinc-300 transition-colors">
                             {sortLabels[sortOption]}
                         </span>
-                        <ChevronDown
-                            size={16}
-                            strokeWidth={3}
-                            className={`transition-transform duration-200 ${showSortMenu ? 'rotate-180' : ''}`}
-                        />
-                    </button>
+                    </div>
+                    {/* Icon Container */}
+                    <div className="h-10 w-10 flex items-center justify-center border border-transparent rounded bg-transparent group-hover:bg-[#111] transition-colors">
+                        <ArrowUpDown className="text-[#4B5320]" size={20} strokeWidth={2} />
+                    </div>
+                </button>
 
-                    {/* Dropdown Menu */}
-                    {showSortMenu && (
-                        <div className="absolute right-0 top-full mt-2 w-full min-w-[160px] bg-[#0F0F0F] border border-[#333] shadow-2xl z-50 flex flex-col py-1">
-                            {Object.entries(sortLabels).map(([key, label]) => (
+                {/* Dropdown Menu */}
+                {showSortMenu && (
+                    <>
+                        <div className="fixed inset-0 z-20 cursor-default" onClick={() => setShowSortMenu(false)}></div>
+                        <div className="absolute right-0 mt-2 w-56 bg-[#0a0a0a] border border-[#333] shadow-[0_10px_40px_rgba(0,0,0,0.5)] z-30 flex flex-col p-1 rounded-sm service-dropdown">
+                            {Object.keys(sortLabels).map(key => (
                                 <button
                                     key={key}
                                     type="button"
-                                    className={`
-                                        w-full text-left px-4 py-3 text-sm font-bold uppercase tracking-wider transition-colors flex items-center justify-between
+                                    className={`w-full text-right px-4 py-3 text-sm font-bold uppercase tracking-wide transition-all
                                         ${sortOption === key
-                                            ? 'bg-[#4B5320] text-white'
-                                            : 'text-[#4B3D21] hover:bg-[#1a1a1a] hover:text-white'
-                                        }
-                                    `}
+                                            ? 'text-[#4B5320] underline decoration-2 underline-offset-4'
+                                            : 'text-zinc-500 hover:text-white hover:bg-[#111]'
+                                        }`}
                                     onClick={() => { setSortOption(key); setShowSortMenu(false); }}
                                 >
-                                    {label}
-                                    {sortOption === key && <Check size={14} strokeWidth={3} />}
+                                    {sortLabels[key]}
                                 </button>
                             ))}
                         </div>
-                    )}
-                </div>
+                    </>
+                )}
             </div>
         </div>
     );
