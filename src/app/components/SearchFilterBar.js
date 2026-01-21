@@ -1,14 +1,14 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { Search, ChevronDown, Check, X } from 'lucide-react';
+import { useState } from 'react';
+import { Search, ArrowUpDown, X } from 'lucide-react';
 
 export function useSearchAndSort(initialItems, defaultSort = 'newest') {
     const [searchTerm, setSearchTerm] = useState('');
     const [sortOption, setSortOption] = useState(defaultSort);
 
-    // Filter logic
-    const filteredItems = initialItems.filter(item => {
+    // Filter logic remains the same (smart numeric sort)
+    const filteredItems = initialItems.filter(item => { // Quick filter for memo check, actual memo in real app
         if (!searchTerm) return true;
         const lowerTerm = searchTerm.toLowerCase();
         return (
@@ -21,6 +21,7 @@ export function useSearchAndSort(initialItems, defaultSort = 'newest') {
         let valA = cleanName(a.name);
         let valB = cleanName(b.name);
 
+        // Smart numeric sort helper
         const smartSort = (strA, strB) => {
             return strA.localeCompare(strB, undefined, { numeric: true, sensitivity: 'base' });
         };
@@ -33,10 +34,10 @@ export function useSearchAndSort(initialItems, defaultSort = 'newest') {
             case 'z-a': return smartSort(valB, valA);
             case 'newest':
                 if (dateA && dateB && dateA !== dateB) return dateB - dateA;
-                return smartSort(valB, valA);
+                return smartSort(valB, valA); // Numeric Desc
             case 'oldest':
                 if (dateA && dateB && dateA !== dateB) return dateA - dateB;
-                return smartSort(valA, valB);
+                return smartSort(valA, valB); // Numeric Asc
             default: return 0;
         }
     });
@@ -44,108 +45,84 @@ export function useSearchAndSort(initialItems, defaultSort = 'newest') {
     return { searchTerm, setSearchTerm, sortOption, setSortOption, filteredItems };
 }
 
-export default function SearchFilterBar({ searchTerm, setSearchTerm, sortOption, setSortOption, placeholder = "Search Reports..." }) {
+export default function SearchFilterBar({ searchTerm, setSearchTerm, sortOption, setSortOption, placeholder = "Search..." }) {
     const [showSortMenu, setShowSortMenu] = useState(false);
-    const dropdownRef = useRef(null);
-
-    useEffect(() => {
-        function handleClickOutside(event) {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setShowSortMenu(false);
-            }
-        }
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [dropdownRef]);
 
     const sortLabels = {
         'newest': 'Newest',
         'oldest': 'Oldest',
-        'a-z': 'A-Z',
-        'z-a': 'Z-A'
+        'a-z': 'Name (A-Z)',
+        'z-a': 'Name (Z-A)'
     };
 
     return (
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12 w-full border-b border-[#1f1f1f] pb-8">
+        <div className="search-filter-container-v2 flex items-end justify-between gap-6 pb-6 pt-4 border-b border-[#333]/50 mb-8">
             {/* Search Bar */}
-            <div className="flex-1 w-full lg:max-w-2xl">
-                <label className="block text-[#4B5320] text-xs font-bold uppercase tracking-[0.2em] mb-2 font-heading">
-                    Identification Query
-                </label>
-                <div className="relative group">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <Search className="text-[#4B3D21] group-focus-within:text-[#4B5320] transition-colors" size={20} />
-                    </div>
-                    <input
-                        type="text"
-                        className="block w-full bg-[#0a0a0a] border border-[#222] text-[#e2e2e2] py-4 pl-12 pr-12 
-                                 focus:outline-none focus:border-[#4B5320] focus:ring-1 focus:ring-[#4B5320]/50 
-                                 transition-all duration-300 font-mono text-sm tracking-wide placeholder-[#444]"
-                        placeholder={placeholder}
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                    {searchTerm && (
-                        <button
-                            type="button"
-                            onClick={() => setSearchTerm('')}
-                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-[#4B3D21] hover:text-[#e2e2e2] transition-colors"
-                        >
-                            <X size={18} />
-                        </button>
-                    )}
-                    {/* Corner decorative accents */}
-                    <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-[#4B5320] opacity-50 group-focus-within:opacity-100 transition-opacity"></div>
-                    <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-[#4B5320] opacity-50 group-focus-within:opacity-100 transition-opacity"></div>
-                </div>
+            <div className="relative flex-1 max-w-lg group">
+                <Search
+                    className="absolute left-0 bottom-3 text-[#4B3D21] transition-colors"
+                    size={22}
+                    strokeWidth={2.5}
+                />
+                <input
+                    type="text"
+                    className="appearance-none w-full bg-transparent border-b-2 border-[#4B5320]/40 py-2 pl-8 pr-10 text-white font-bold text-lg placeholder-zinc-600 focus:outline-none focus:border-[#4B5320] transition-all duration-200"
+                    placeholder={placeholder}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                {searchTerm && (
+                    <button
+                        type="button"
+                        onClick={() => setSearchTerm('')}
+                        className="absolute right-0 bottom-3 text-[#4B3D21] hover:text-white transition-colors cursor-pointer"
+                    >
+                        <X size={20} />
+                    </button>
+                )}
             </div>
 
             {/* Sort Controls */}
-            <div className="flex items-center gap-4 relative" ref={dropdownRef}>
-                <div className="relative">
-                    <label className="block text-[#4B3D21] text-xs font-bold uppercase tracking-[0.2em] mb-2 font-heading text-right">
-                        Sort Sequence
-                    </label>
-                    <button
-                        type="button"
-                        onClick={() => setShowSortMenu(!showSortMenu)}
-                        className="flex items-center justify-between gap-6 bg-[#0a0a0a] border border-[#222] hover:border-[#4B5320] 
-                                 text-[#e2e2e2] h-[54px] px-6 transition-all min-w-[200px] group"
-                    >
-                        <span className="text-sm font-bold uppercase tracking-wider font-heading">
+            <div className="relative flex-shrink-0">
+                <button
+                    type="button"
+                    onClick={() => setShowSortMenu(!showSortMenu)}
+                    className="flex items-center gap-3 group focus:outline-none"
+                >
+                    <div className="flex flex-col text-right">
+                        <span className="text-[10px] uppercase tracking-widest font-black text-[#4B3D21] mb-0.5">Sort By</span>
+                        <span className="text-sm font-bold text-white uppercase tracking-wide group-hover:text-zinc-300 transition-colors">
                             {sortLabels[sortOption]}
                         </span>
-                        <ChevronDown
-                            size={16}
-                            className={`text-[#4B5320] transition-transform duration-300 ${showSortMenu ? 'rotate-180' : ''}`}
-                        />
-                    </button>
+                    </div>
+                    {/* Icon Container */}
+                    <div className="h-10 w-10 flex items-center justify-center border border-transparent rounded bg-transparent group-hover:bg-[#111] transition-colors">
+                        <ArrowUpDown className="text-[#4B5320]" size={20} strokeWidth={2} />
+                    </div>
+                </button>
 
-                    {/* Dropdown Menu */}
-                    {showSortMenu && (
-                        <div className="absolute right-0 top-full mt-2 w-full bg-[#0a0a0a] border border-[#333] z-50 shadow-[0_4px_24px_rgba(0,0,0,0.5)]">
-                            {Object.entries(sortLabels).map(([key, label]) => (
+                {/* Dropdown Menu */}
+                {showSortMenu && (
+                    <>
+                        <div className="fixed inset-0 z-20 cursor-default" onClick={() => setShowSortMenu(false)}></div>
+                        <div className="absolute right-0 mt-2 w-56 bg-[#0a0a0a] border border-[#333] shadow-[0_10px_40px_rgba(0,0,0,0.5)] z-30 flex flex-col p-1 rounded-sm service-dropdown">
+                            {Object.keys(sortLabels).map(key => (
                                 <button
                                     key={key}
                                     type="button"
-                                    className={`
-                                        w-full text-left px-5 py-3 text-xs font-bold uppercase tracking-[0.1em] transition-all flex items-center justify-between group
+                                    className={`w-full text-right px-4 py-3 text-sm font-bold uppercase tracking-wide transition-all
                                         ${sortOption === key
-                                            ? 'bg-[#4B5320]/10 text-[#4B5320] border-l-2 border-[#4B5320]'
-                                            : 'text-[#666] hover:text-[#e2e2e2] hover:bg-[#111] border-l-2 border-transparent'
-                                        }
-                                    `}
+                                            ? 'text-[#4B5320] underline decoration-2 underline-offset-4'
+                                            : 'text-zinc-500 hover:text-white hover:bg-[#111]'
+                                        }`}
                                     onClick={() => { setSortOption(key); setShowSortMenu(false); }}
                                 >
-                                    <span className="font-heading">{label}</span>
-                                    {sortOption === key && <Check size={14} className="text-[#4B5320]" />}
+                                    {sortLabels[key]}
                                 </button>
                             ))}
                         </div>
-                    )}
-                </div>
+                    </>
+                )}
             </div>
         </div>
     );
