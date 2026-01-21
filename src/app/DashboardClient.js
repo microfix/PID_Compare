@@ -29,28 +29,33 @@ export default function DashboardClient({ folders }) {
             />
 
             {filteredItems.length === 0 ? (
-                <div className="card">
-                    <p>{searchTerm ? `Ingen resultater fundet for '${searchTerm}'` : "No comparisons found in archive."}</p>
+                <div className="bg-[#111] border border-[#333] p-6 rounded-sm">
+                    <p className="text-zinc-400">{searchTerm ? `Ingen resultater fundet for '${searchTerm}'` : "No comparisons found in archive."}</p>
                 </div>
             ) : (
-                <div className="grid">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredItems.map((folder) => {
                         const status = getStatus(folder);
                         return (
-                            <Link href={`/plant/${folder.id}`} key={folder.id} className="card-link">
-                                <div className="card">
-                                    <div className="flex-between" style={{ marginBottom: '1rem' }}>
-                                        <div className={`status-badge ${status === 'critical' ? 'status-critical' : 'status-safe'}`}>
+                            <Link href={`/plant/${folder.id}`} key={folder.id} className="block group">
+                                <div className="bg-[#111] border border-[#333] p-6 transition-all duration-200 group-hover:border-[#4B5320] relative h-full flex flex-col">
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div className={`
+                                            px-2 py-1 text-xs font-bold font-mono tracking-wider uppercase
+                                            ${status === 'critical' ? 'bg-[#8b0000] text-white' : 'bg-[#4B5320] text-white'}
+                                        `}>
                                             {status === 'critical' ? 'Critical' : 'Safe'}
                                         </div>
-                                        <span className="text-muted" style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center' }}>
-                                            <Clock size={14} style={{ marginRight: '4px' }} />
+                                        <span className="text-[#666] text-xs flex items-center font-mono group-hover:text-[#888] transition-colors">
+                                            <Clock size={12} className="mr-1.5" />
                                             {new Date(folder.createdTime).toLocaleDateString()}
                                         </span>
                                     </div>
-                                    <h3>{folder.name.replace(/\.[^/.]+$/, "")}</h3>
-                                    <div style={{ marginTop: '1rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                                        View Comparison Report &rarr;
+                                    <h3 className="text-xl font-bold text-white mb-auto tracking-tight">
+                                        {folder.name.replace(/\.[^/.]+$/, "")}
+                                    </h3>
+                                    <div className="mt-6 text-sm text-[#4B3D21] font-bold group-hover:text-[#4B5320] transition-colors flex items-center">
+                                        View Comparison Report <span className="ml-1 text-lg leading-none">&rarr;</span>
                                     </div>
                                 </div>
                             </Link>
