@@ -5,6 +5,11 @@ export async function GET(request, { params }) {
     // Await params for Next.js 15+ compatibility
     const { id } = await params;
 
+    // TODO: Integrate Firebase Auth check here.
+    // Verify 'Authorization' header contains valid Firebase ID Token before serving file.
+    // const authHeader = request.headers.get('Authorization');
+    // if (!authHeader) return new NextResponse("Unauthorized", { status: 401 });
+
     try {
         console.log(`Streaming file ID: ${id}`);
 

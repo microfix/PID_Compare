@@ -158,10 +158,8 @@ export async function getComparisons(folderId) {
     // Map filename -> file object
     const fileMap = new Map();
     files.forEach(f => {
-      // Store exact name
-      fileMap.set(f.name, f);
-      // Also store lowercase for case-insensitivity if needed? 
-      // User prompt implies exact revision matching: "001c" -> "001c.pdf"
+      // Store exact name case-insensitive
+      fileMap.set(f.name.toLowerCase(), f);
     });
 
     for (const file of htmlFiles) {
@@ -171,9 +169,9 @@ export async function getComparisons(folderId) {
         const revB = match[2].trim();
 
         // Find corresponding PDFs
-        // Assumption: PDF name is exactly "[Rev].pdf"
-        const pdfA = fileMap.get(`${revA}.pdf`);
-        const pdfB = fileMap.get(`${revB}.pdf`);
+        // Assumption: PDF name is exactly "[Rev].pdf" case-insensitive
+        const pdfA = fileMap.get(`${revA}.pdf`.toLowerCase());
+        const pdfB = fileMap.get(`${revB}.pdf`.toLowerCase());
 
         if (pdfA && pdfB) {
           comparisons.push({
