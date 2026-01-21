@@ -1,6 +1,5 @@
 import { getComparisons } from '@/lib/drive';
-import Link from 'next/link';
-import { ArrowLeft, Folder } from 'lucide-react';
+import PlantClient from './PlantClient';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,43 +16,16 @@ export default async function PlantPage({ params }) {
         error = "Could not load plant details.";
     }
 
-    return (
-        <main className="container">
-            <div className="flex-between" style={{ marginBottom: '2rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <Link href="/" style={{ display: 'flex', alignItems: 'center' }}>
-                        <ArrowLeft size={24} />
-                    </Link>
-                    <h1 className="title" style={{ marginBottom: 0 }}>Select Document System</h1>
-                </div>
-            </div>
-
-            {error ? (
+    if (error) {
+        return (
+            <main className="container">
                 <div className="card" style={{ borderColor: 'var(--status-critical)' }}>
                     <h3 style={{ color: 'var(--status-critical)' }}>Error</h3>
                     <p>{error}</p>
                 </div>
-            ) : folders.length === 0 ? (
-                <div className="card">
-                    <p>No document folders found.</p>
-                </div>
-            ) : (
-                <div className="grid">
-                    {folders.map((folder) => (
-                        <Link href={`/system/${folder.id}`} key={folder.id} className="card-link">
-                            <div className="card">
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                                    <Folder size={24} style={{ color: 'var(--accent-blue)' }} />
-                                    <h3>{folder.name.replace(/\.[^/.]+$/, "")}</h3>
-                                </div>
-                                <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                                    View Comparisons &rarr;
-                                </div>
-                            </div>
-                        </Link>
-                    ))}
-                </div>
-            )}
-        </main>
-    );
+            </main>
+        );
+    }
+
+    return <PlantClient folders={folders} />;
 }
