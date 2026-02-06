@@ -10,8 +10,8 @@ export default async function Dashboard() {
   try {
     folders = await listArchiveFolders();
   } catch (e) {
-    console.error("Failed to fetch folders", e);
-    error = "Could not load archive. Check authentication.";
+    console.error('Failed to fetch folders', e);
+    error = 'Could not load archive. Check authentication.';
   }
 
   if (error) {
