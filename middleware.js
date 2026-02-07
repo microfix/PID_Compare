@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
-// Auto-login middleware:
-// - Hvis ingen session -> send direkte til Authentik provider (ingen "klik login")
-// - Ellers lad request fortsætte
+// Nicolai-ønske:
+// - pid.appfix.org skal være PID Compare
+// - hvis man IKKE er logget ind (SSO), så skal pid sende en til da (ikke db, ikke en "klik login"-side)
+// - når man ER logget ind, så skal PID Compare virke direkte
 export async function middleware(req) {
-  const { pathname, search } = req.nextUrl;
+  const { pathname } = req.nextUrl;
 
   // Lad NextAuth endpoints og statics være
   if (
@@ -20,11 +21,8 @@ export async function middleware(req) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   if (token) return NextResponse.next();
 
-  const callbackUrl = encodeURIComponent(`${pathname}${search || ''}`);
-  const url = req.nextUrl.clone();
-  url.pathname = '/api/auth/signin/authentik';
-  url.search = `callbackUrl=${callbackUrl}`;
-  return NextResponse.redirect(url);
+  // Ikke logget ind → send til dashboardet (da auto-kicker SSO flow)
+  return NextResponse.redirect('https://da.appfix.org/', 307);
 }
 
 export const config = {
